@@ -31,9 +31,10 @@ def test_colour_math():
 def test_mapping():
     style = build.build_family()["themes"][0]["style"]
     syn, P = style["syntax"], build.P
-    assert syn["comment"]["color"] == P["prose"] and syn["comment"]["font_style"] is None
-    # the prose is a touch dimmer than the UI text, so it is not the same white as the code
-    assert style["text"] == P["text"] != P["prose"]
+    # the prose is set in italic: that, not the colour, sets it apart from the code
+    for key in ("comment", "comment.doc"):
+        assert syn[key] == {"color": P["prose"], "font_style": "italic", "font_weight": None}
+    assert style["text"] == P["prose"]
     assert syn["function.definition"] == {"color": P["call"], "font_style": None, "font_weight": 700}
     assert syn["function.macro"]["color"] == P["macro"]
     assert style["editor.background"] == build.oklch_to_hex(*build.INK)

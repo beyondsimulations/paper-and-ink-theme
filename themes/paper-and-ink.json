@@ -187,27 +187,27 @@
         ],
         "syntax": {
           "comment": {
-            "color": "#EADCC9",
-            "font_style": null,
+            "color": "#F2EADE",
+            "font_style": "italic",
             "font_weight": null
           },
           "comment.doc": {
-            "color": "#EADCC9",
-            "font_style": null,
+            "color": "#F2EADE",
+            "font_style": "italic",
             "font_weight": null
           },
           "title": {
-            "color": "#EADCC9",
+            "color": "#F2EADE",
             "font_style": null,
             "font_weight": 700
           },
           "emphasis": {
-            "color": "#EADCC9",
+            "color": "#F2EADE",
             "font_style": "italic",
             "font_weight": null
           },
           "emphasis.strong": {
-            "color": "#EADCC9",
+            "color": "#F2EADE",
             "font_style": null,
             "font_weight": 700
           },

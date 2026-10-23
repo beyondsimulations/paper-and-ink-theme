@@ -7,7 +7,8 @@ comments on a deep ink ground, with soft code colours underneath.
 
 Most dark themes grey out comments. In tutorials and notebooks in percent format
 (`# %%` cells), the comments are the instructions, so Paper & Ink makes them the
-brightest text on screen and gives the code fewer, calmer colours.
+brightest text on screen, sets them in italic and gives the code fewer, calmer
+colours.
 
 ## Install
 
@@ -18,11 +19,11 @@ it with **theme selector: toggle**.
 ## Colours
 
 Every colour is defined once in `build.py` as OKLCH. Contrast follows APCA:
-comments Lc 86, plain code Lc 76, every syntax colour at least Lc 55.
+comments Lc 94, plain code Lc 76, every syntax colour at least Lc 55.
 
 | Role | Colour |
 |---|---|
-| Comments, markdown text | `#EADCC9` |
+| Comments (italic), markdown text | `#F2EADE` |
 | Plain code | `#D1CDC8` |
 | Function calls (bold where defined) | `#EED284` |
 | Strings | `#77D4CE` |
