@@ -38,6 +38,37 @@ def test_mapping():
     assert style["warning"] == P["constant"] != syn["function"]["color"]
 
 
+def test_real_theme_passes():
+    assert build.check(build.build_family(), SCHEMA) == []
+
+
+def broken(path, value):
+    family = build.build_family()
+    target = family["themes"][0]["style"]
+    for key in path[:-1]:
+        target = target[key]
+    target[path[-1]] = value
+    return build.check(family, SCHEMA)
+
+
+def test_checks_catch_failures():
+    dim = build.oklch_to_hex(0.55, 0.01, 70)
+    assert any("contrast: prose" in f for f in broken(["syntax", "comment", "color"], dim))
+    # code as bright as prose: contrast is fine, the lightness gap is not
+    assert any("lightness" in f for f in broken(["editor.foreground"], build.P["prose"]))
+    assert any("call and constant" in f for f in broken(["syntax", "function", "color"], build.P["constant"]))
+    assert any("error and macro" in f for f in broken(["error"], build.P["macro"]))
+    family = build.build_family()
+    del family["themes"][0]["style"]["editor.indent_guide"]
+    assert "missing key: editor.indent_guide" in build.check(family, SCHEMA)
+    assert any(f.startswith("schema") for f in broken(["syntax", "comment", "font_weight"], 450))
+    # the checks must not mutate the family they inspect
+    family = build.build_family()
+    snapshot = copy.deepcopy(family)
+    build.check(family, SCHEMA)
+    assert family == snapshot
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

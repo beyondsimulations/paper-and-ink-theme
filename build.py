@@ -230,11 +230,65 @@ def build_family():
     }
 
 
+# ---- checks ----
+
+# Contrast floors (APCA Lc), checked on the ground and on the active line
+FLOORS = {"prose": 90, "code": 75, "call": 55, "string": 55, "constant": 55, "keyword": 55, "macro": 55,
+          "error": 45, "punct": 35, "line_number": 30}
+# Keys Zed's own One Dark sets that schema v0.2.0 does not list yet
+NEWER_KEYS = ["search.active_match_background", "editor.hover_line_number", "version_control.added",
+              "version_control.modified", "version_control.deleted", "version_control.word_added",
+              "version_control.word_deleted", "version_control.conflict_marker.ours",
+              "version_control.conflict_marker.theirs"]
+
+
+def shipped_colours(style):
+    """The colour of each checked role, read from the generated theme (not from P)."""
+    syn = style["syntax"]
+    return {"prose": syn["comment"]["color"], "code": style["editor.foreground"],
+            "call": syn["function"]["color"], "string": syn["string"]["color"],
+            "constant": syn["number"]["color"], "keyword": syn["keyword"]["color"],
+            "macro": syn["function.macro"]["color"], "error": style["error"],
+            "punct": syn["punctuation"]["color"], "line_number": style["editor.line_number"]}
+
+
+def check(family, schema):
+    """List of failed checks; empty when the theme is fine."""
+    import jsonschema
+
+    failures = []
+    try:
+        jsonschema.validate(family, schema)
+    except jsonschema.ValidationError as e:
+        failures.append(f"schema: {e.message}")
+    style = family["themes"][0]["style"]
+    wanted = list(schema["definitions"]["ThemeStyleContent"]["properties"]) + NEWER_KEYS
+    failures += [f"missing key: {k}" for k in wanted if k not in style]
+
+    c = shipped_colours(style)
+    for bg_key in ("editor.background", "editor.active_line.background"):
+        for role, floor in FLOORS.items():
+            lc = apca(c[role], style[bg_key])
+            if lc < floor:
+                failures.append(f"contrast: {role} {c[role]} on {bg_key} is Lc {lc:.1f}, needs {floor}")
+    gap = hex_to_oklch(c["prose"])[0] - hex_to_oklch(c["code"])[0]
+    if gap < 0.08:
+        failures.append(f"prose and code only {gap:.3f} apart in lightness, need 0.08")
+    for a, b in (("call", "constant"), ("error", "macro")):
+        d = oklab_distance(c[a], c[b])
+        if d < 0.08:
+            failures.append(f"{a} and {b} only {d:.3f} apart in OKLab, need 0.08")
+    return failures
+
+
 def main():
     family = build_family()
+    failures = check(family, json.loads(SCHEMA.read_text()))
     OUT.write_text(json.dumps(family, indent=2) + "\n")
     print(f"wrote {OUT.relative_to(ROOT)}")
-    return 0
+    for f in failures:
+        print("FAIL", f)
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
