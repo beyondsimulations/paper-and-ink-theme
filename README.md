@@ -26,7 +26,7 @@ comments Lc 94, plain code Lc 76, every syntax colour at least Lc 55.
 | Comments (italic), markdown text | `#F2EADE` |
 | Plain code | `#D1CDC8` |
 | Function calls (bold where defined) | `#EED284` |
-| Strings | `#77D4CE` |
+| Strings | `#97CDCC` |
 | Numbers, constants | `#F5A75E` |
 | Keywords, types | `#7ABAE0` |
 | Macros, decorators | `#F3928F` |

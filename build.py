@@ -96,7 +96,7 @@ PALETTE = {
     "disabled": (0.44, 0.008, 65),
     # syntax hues, chroma × 0.85 of round 2 ("soft"), lightness stepped by role
     "call": (0.87, 0.102, 90),  # gold
-    "string": (0.81, 0.089, 190),  # teal
+    "string": (0.81, 0.055, 195),  # calmer teal
     "constant": (0.79, 0.128, 62),  # orange
     "keyword": (0.76, 0.085, 235),  # blue
     "macro": (0.76, 0.119, 22),  # coral
