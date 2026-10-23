@@ -29,25 +29,33 @@ def test_colour_math():
 
 
 def test_mapping():
-    style = build.build_family()["themes"][0]["style"]
-    syn, P = style["syntax"], build.P
-    # the prose is set in italic: that, not the colour, sets it apart from the code
-    for key in ("comment", "comment.doc"):
-        assert syn[key] == {"color": P["prose"], "font_style": "italic", "font_weight": None}
-    assert style["text"] == P["prose"]
-    assert syn["function.definition"] == {"color": P["call"], "font_style": None, "font_weight": 700}
-    assert syn["function.macro"]["color"] == P["macro"]
-    assert style["editor.background"] == build.oklch_to_hex(*build.INK)
-    assert style["warning"] == P["constant"] != syn["function"]["color"]
+    family = build.build_family()
+    assert [(t["name"], t["appearance"]) for t in family["themes"]] == [
+        ("Paper & Ink Dark", "dark"), ("Paper & Ink Light", "light")]
+    for theme, t in zip(build.THEMES, family["themes"]):
+        style, syn, P = t["style"], t["style"]["syntax"], build.hexes(theme)
+        # the prose is set in italic: that, not the colour, sets it apart from the code
+        for key in ("comment", "comment.doc"):
+            assert syn[key] == {"color": P["prose"], "font_style": "italic", "font_weight": None}
+        assert style["text"] == P["prose"]
+        assert syn["function.definition"] == {"color": P["call"], "font_style": None, "font_weight": 700}
+        assert syn["function.macro"]["color"] == P["macro"]
+        assert style["warning"] == P["constant"] != syn["function"]["color"]
+    dark, light = (t["style"] for t in family["themes"])
+    assert dark["editor.background"] == "#161311"
+    assert light["editor.background"] == "#FFFDFC"  # the website's page colour
+    # panels sit below the editor in both: deeper than the ink, greyer than the paper
+    for style in (dark, light):
+        assert build.hex_to_oklch(style["panel.background"])[0] < build.hex_to_oklch(style["editor.background"])[0]
 
 
 def test_real_theme_passes():
     assert build.check(build.build_family(), SCHEMA) == []
 
 
-def broken(path, value):
+def broken(path, value, theme=0):
     family = build.build_family()
-    target = family["themes"][0]["style"]
+    target = family["themes"][theme]["style"]
     for key in path[:-1]:
         target = target[key]
     target[path[-1]] = value
@@ -55,15 +63,19 @@ def broken(path, value):
 
 
 def test_checks_catch_failures():
+    P = build.hexes(build.DARK)
     dim = build.oklch_to_hex(0.55, 0.01, 70)
-    assert any("contrast: prose" in f for f in broken(["syntax", "comment", "color"], dim))
+    assert any(f.startswith("Paper & Ink Dark: contrast: prose") for f in broken(["syntax", "comment", "color"], dim))
     # code in the prose colour: contrast is fine, but the two can no longer be told apart
-    assert any("prose and code" in f for f in broken(["editor.foreground"], build.P["prose"]))
-    assert any("call and constant" in f for f in broken(["syntax", "function", "color"], build.P["constant"]))
-    assert any("error and macro" in f for f in broken(["error"], build.P["macro"]))
+    assert any("prose and code" in f for f in broken(["editor.foreground"], P["prose"]))
+    assert any("call and constant" in f for f in broken(["syntax", "function", "color"], P["constant"]))
+    assert any("error and macro" in f for f in broken(["error"], P["macro"]))
+    # the light theme is checked too, against its own paper
+    pale = build.oklch_to_hex(0.75, 0.01, 60)
+    assert any(f.startswith("Paper & Ink Light: contrast: prose") for f in broken(["syntax", "comment", "color"], pale, theme=1))
     family = build.build_family()
-    del family["themes"][0]["style"]["editor.indent_guide"]
-    assert "missing key: editor.indent_guide" in build.check(family, SCHEMA)
+    del family["themes"][1]["style"]["editor.indent_guide"]
+    assert "Paper & Ink Light: missing key: editor.indent_guide" in build.check(family, SCHEMA)
     assert any(f.startswith("schema") for f in broken(["syntax", "comment", "font_weight"], 450))
     # the checks must not mutate the family they inspect
     family = build.build_family()
