@@ -28,6 +28,16 @@ def test_colour_math():
     assert build.oklab_distance("#000000", "#FFFFFF") > 0.99
 
 
+def test_mapping():
+    style = build.build_family()["themes"][0]["style"]
+    syn, P = style["syntax"], build.P
+    assert syn["comment"]["color"] == P["prose"] and syn["comment"]["font_style"] is None
+    assert syn["function.definition"] == {"color": P["call"], "font_style": None, "font_weight": 700}
+    assert syn["function.macro"]["color"] == P["macro"]
+    assert style["editor.background"] == build.oklch_to_hex(*build.INK)
+    assert style["warning"] == P["constant"] != syn["function"]["color"]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
