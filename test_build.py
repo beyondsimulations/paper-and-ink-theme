@@ -32,6 +32,8 @@ def test_mapping():
     style = build.build_family()["themes"][0]["style"]
     syn, P = style["syntax"], build.P
     assert syn["comment"]["color"] == P["prose"] and syn["comment"]["font_style"] is None
+    # the prose is a touch dimmer than the UI text, so it is not the same white as the code
+    assert style["text"] == P["text"] != P["prose"]
     assert syn["function.definition"] == {"color": P["call"], "font_style": None, "font_weight": 700}
     assert syn["function.macro"]["color"] == P["macro"]
     assert style["editor.background"] == build.oklch_to_hex(*build.INK)
@@ -54,8 +56,8 @@ def broken(path, value):
 def test_checks_catch_failures():
     dim = build.oklch_to_hex(0.55, 0.01, 70)
     assert any("contrast: prose" in f for f in broken(["syntax", "comment", "color"], dim))
-    # code as bright as prose: contrast is fine, the lightness gap is not
-    assert any("lightness" in f for f in broken(["editor.foreground"], build.P["prose"]))
+    # code in the prose colour: contrast is fine, but the two can no longer be told apart
+    assert any("prose and code" in f for f in broken(["editor.foreground"], build.P["prose"]))
     assert any("call and constant" in f for f in broken(["syntax", "function", "color"], build.P["constant"]))
     assert any("error and macro" in f for f in broken(["error"], build.P["macro"]))
     family = build.build_family()

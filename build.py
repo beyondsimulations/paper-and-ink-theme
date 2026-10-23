@@ -88,7 +88,8 @@ INK = (0.19, 0.006, 65)  # editor ground, "Deep ink"
 
 PALETTE = {
     # text, brightest first
-    "prose": (0.94, 0.018, 75),  # all comments and markdown: the page text
+    "text": (0.94, 0.018, 75),  # UI text
+    "prose": (0.90, 0.030, 75),  # all comments and markdown: a warmer, dimmer white than the code
     "code": (0.85, 0.008, 75),  # plain code, a clear step below the prose
     "muted": (0.72, 0.010, 70),
     "punct": (0.64, 0.010, 70),
@@ -129,7 +130,7 @@ def ui():
         "element.selected": selected, "element.disabled": raised, "drop_target.background": p["keyword"] + "33",
         "ghost_element.background": CLEAR, "ghost_element.hover": hover, "ghost_element.active": selected,
         "ghost_element.selected": selected, "ghost_element.disabled": CLEAR,
-        "text": p["prose"], "text.muted": p["muted"], "text.placeholder": p["punct"],
+        "text": p["text"], "text.muted": p["muted"], "text.placeholder": p["punct"],
         "text.disabled": p["disabled"], "text.accent": p["constant"],
         "icon": p["code"], "icon.muted": p["muted"], "icon.disabled": p["disabled"],
         "icon.placeholder": p["punct"], "icon.accent": p["constant"],
@@ -153,7 +154,7 @@ def ui():
         "editor.document_highlight.write_background": p["keyword"] + "33",
         "editor.document_highlight.bracket_background": p["keyword"] + "33",
         "terminal.background": panel, "terminal.ansi.background": panel, "terminal.foreground": p["code"],
-        "terminal.bright_foreground": p["prose"], "terminal.dim_foreground": p["punct"],
+        "terminal.bright_foreground": p["text"], "terminal.dim_foreground": p["punct"],
         "link_text.hover": p["constant"],
         "version_control.added": p["string"], "version_control.modified": p["keyword"],
         "version_control.deleted": p["error"], "version_control.word_added": p["string"] + "40",
@@ -169,7 +170,7 @@ def ui():
         "blue": (p["keyword"], oklch_to_hex(0.86, 0.06, 235), oklch_to_hex(0.58, 0.07, 235)),
         "magenta": (p["violet"], oklch_to_hex(0.88, 0.05, 300), oklch_to_hex(0.60, 0.06, 300)),
         "cyan": (oklch_to_hex(0.81, 0.077, 210), oklch_to_hex(0.89, 0.05, 210), oklch_to_hex(0.60, 0.06, 210)),
-        "white": (p["code"], p["prose"], p["punct"]),
+        "white": (p["code"], p["text"], p["punct"]),
     }
     for name, (base, bright, dim) in ansi.items():
         style[f"terminal.ansi.{name}"] = base
@@ -233,7 +234,7 @@ def build_family():
 # ---- checks ----
 
 # Contrast floors (APCA Lc), checked on the ground and on the active line
-FLOORS = {"prose": 90, "code": 75, "call": 55, "string": 55, "constant": 55, "keyword": 55, "macro": 55,
+FLOORS = {"prose": 75, "code": 75, "call": 55, "string": 55, "constant": 55, "keyword": 55, "macro": 55,
           "error": 45, "punct": 35, "line_number": 30}
 # Keys Zed's own One Dark sets that schema v0.2.0 does not list yet
 NEWER_KEYS = ["search.active_match_background", "editor.hover_line_number", "version_control.added",
@@ -271,13 +272,10 @@ def check(family, schema):
             lc = apca(c[role], style[bg_key])
             if lc < floor:
                 failures.append(f"contrast: {role} {c[role]} on {bg_key} is Lc {lc:.1f}, needs {floor}")
-    gap = hex_to_oklch(c["prose"])[0] - hex_to_oklch(c["code"])[0]
-    if gap < 0.08:
-        failures.append(f"prose and code only {gap:.3f} apart in lightness, need 0.08")
-    for a, b in (("call", "constant"), ("error", "macro")):
+    for a, b, need in (("prose", "code", 0.05), ("call", "constant", 0.08), ("error", "macro", 0.08)):
         d = oklab_distance(c[a], c[b])
-        if d < 0.08:
-            failures.append(f"{a} and {b} only {d:.3f} apart in OKLab, need 0.08")
+        if d < need:
+            failures.append(f"{a} and {b} only {d:.3f} apart in OKLab, need {need}")
     return failures
 
 

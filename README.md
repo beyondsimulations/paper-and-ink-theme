@@ -18,11 +18,11 @@ it with **theme selector: toggle**.
 ## Colours
 
 Every colour is defined once in `build.py` as OKLCH. Contrast follows APCA:
-comments Lc 94, plain code Lc 76, every syntax colour at least Lc 55.
+comments Lc 86, plain code Lc 76, every syntax colour at least Lc 55.
 
 | Role | Colour |
 |---|---|
-| Comments, markdown text | `#F2EADE` |
+| Comments, markdown text | `#EADCC9` |
 | Plain code | `#D1CDC8` |
 | Function calls (bold where defined) | `#EED284` |
 | Strings | `#77D4CE` |
