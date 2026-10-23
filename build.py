@@ -82,6 +82,15 @@ def apca(text, bg):
     return 0.0 if s > -0.1 else -(s + 0.027) * 100
 
 
+def wcag(a, b):
+    """WCAG 2 contrast ratio of two colours (1 to 21)."""
+    def lum(hex_):
+        r, g, b_ = (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in _rgb(hex_))
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b_
+    hi, lo = sorted((lum(a), lum(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
 # ---- the two themes: every colour as OKLCH (L, C, h) ----
 
 DARK = {
@@ -93,7 +102,7 @@ DARK = {
         "code": (0.85, 0.008, 75),  # plain code, a clear step below the prose
         "muted": (0.72, 0.010, 70),
         "punct": (0.64, 0.010, 70),
-        "line_number": (0.58, 0.010, 65),
+        "line_number": (0.62, 0.010, 65),  # WCAG AA 4.5:1 on the active line
         "disabled": (0.44, 0.008, 65),
         # syntax hues, lightness stepped by role
         "call": (0.87, 0.102, 90),  # gold
@@ -135,13 +144,13 @@ LIGHT = {
         "prose": (0.27, 0.020, 55),  # the darkest text, in italic
         "code": (0.42, 0.012, 60),
         "muted": (0.50, 0.010, 60),
-        "punct": (0.58, 0.010, 60),
-        "line_number": (0.66, 0.010, 60),
+        "punct": (0.545, 0.010, 60),
+        "line_number": (0.55, 0.010, 60),  # WCAG AA, like every text colour
         "disabled": (0.72, 0.008, 60),
         # the dark theme's hues, darkened for paper
-        "call": (0.52, 0.105, 80),  # ochre
+        "call": (0.50, 0.110, 80),  # ochre, kept 0.09 from the darker orange
         "string": (0.51, 0.065, 195),  # teal
-        "constant": (0.58, 0.150, 52),  # orange
+        "constant": (0.555, 0.150, 52),  # orange, dark enough for 4.5:1
         "keyword": (0.50, 0.095, 245),  # blue
         "macro": (0.52, 0.140, 8),  # rose, apart from the error red
         "violet": (0.50, 0.100, 300),
@@ -310,7 +319,8 @@ def build_family():
 
 # ---- checks ----
 
-# Contrast floors (APCA Lc), checked on the ground and on the active line of each theme
+# Contrast floors (APCA Lc), checked on the ground and on the active line of each theme.
+# Every checked role must also reach WCAG 2 AA, 4.5:1, on both.
 FLOORS = {"prose": 75, "code": 75, "call": 55, "string": 55, "constant": 55, "keyword": 55, "macro": 55,
           "error": 45, "punct": 35, "line_number": 30}
 # Keys Zed's own One Dark sets that schema v0.2.0 does not list yet
@@ -349,6 +359,9 @@ def check(family, schema):
                 lc = apca(c[role], style[bg_key])
                 if lc < floor:
                     failures.append(f"{name}: contrast: {role} {c[role]} on {bg_key} is Lc {lc:.1f}, needs {floor}")
+                ratio = wcag(c[role], style[bg_key])
+                if ratio < 4.5:
+                    failures.append(f"{name}: wcag: {role} {c[role]} on {bg_key} is {ratio:.2f}:1, needs 4.5:1")
         for a, b, need in (("prose", "code", 0.05), ("call", "constant", 0.08), ("error", "macro", 0.08)):
             d = oklab_distance(c[a], c[b])
             if d < need:

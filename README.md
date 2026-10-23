@@ -28,15 +28,16 @@ To follow your system's light and dark mode, put this in your settings
 
 Every colour is defined once in `build.py` as OKLCH. Contrast follows APCA:
 comments Lc 94 (dark) and 97 (light), plain code Lc 76 and 84, every syntax
-colour at least Lc 55.
+colour at least Lc 55. Every text colour, line numbers included, also meets
+WCAG 2 AA (4.5:1) in both themes.
 
 | Role | Dark | Light |
 |---|---|---|
 | Comments (italic), markdown text | `#F2EADE` | `#2E241D` |
 | Plain code | `#D1CDC8` | `#524C47` |
-| Function calls (bold where defined) | `#EED284` | `#886108` |
+| Function calls (bold where defined) | `#EED284` | `#815B04` |
 | Strings | `#97CDCC` | `#327272` |
-| Numbers, constants | `#F5A75E` | `#BC5B03` |
+| Numbers, constants | `#F5A75E` | `#B15602` |
 | Keywords, types | `#7ABAE0` | `#2E6896` |
 | Macros, decorators | `#F3928F` | `#A83F59` |
 | Background | `#161311` | `#FFFDFC` |

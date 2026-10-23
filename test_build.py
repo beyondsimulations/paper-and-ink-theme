@@ -17,6 +17,9 @@ def test_colour_math():
     assert round(build.apca("#FFFFFF", "#000000"), 1) == 107.9
     assert round(build.apca("#888888", "#FFFFFF"), 1) == 63.1
     assert build.apca("#777777", "#777777") == 0.0
+    # WCAG 2 contrast ratio: black on white 21:1, #777 on white 4.48:1 (just under AA)
+    assert round(build.wcag("#000000", "#FFFFFF"), 2) == 21.0
+    assert round(build.wcag("#777777", "#FFFFFF"), 2) == round(build.wcag("#FFFFFF", "#777777"), 2) == 4.48
     # OKLCH round trip on a brand colour, and the extremes
     L, C, h = build.hex_to_oklch("#F6B265")
     assert (round(L, 3), round(C, 3), round(h, 1)) == (0.812, 0.123, 68.0)
@@ -73,6 +76,8 @@ def test_checks_catch_failures():
     # the light theme is checked too, against its own paper
     pale = build.oklch_to_hex(0.75, 0.01, 60)
     assert any(f.startswith("Paper & Ink Light: contrast: prose") for f in broken(["syntax", "comment", "color"], pale, theme=1))
+    # WCAG AA too: the first light orange passed APCA but not 4.5:1
+    assert any(f.startswith("Paper & Ink Light: wcag: constant") for f in broken(["syntax", "number", "color"], "#BC5B03", theme=1))
     family = build.build_family()
     del family["themes"][1]["style"]["editor.indent_guide"]
     assert "Paper & Ink Light: missing key: editor.indent_guide" in build.check(family, SCHEMA)
