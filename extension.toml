@@ -1,0 +1,7 @@
+id = "paper-and-ink-theme"
+name = "Paper & Ink"
+version = "0.1.0"
+schema_version = 1
+authors = ["Tobias Vlcek <vlcek@beyondsimulations.com>"]
+description = "A dark theme for reading code with text in it: paper-white comments on deep ink, soft code colours."
+repository = "https://github.com/beyondsimulations/paper-and-ink-theme"
