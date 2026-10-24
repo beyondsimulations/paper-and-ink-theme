@@ -56,6 +56,9 @@ the base hues, not lighter ones.
 | Macros, decorators | `#F3928F` | `#A83F59` |
 | Background | `#131415` | `#FFFDFC` |
 
+Every colour at a glance: open [`showcase.jl`](showcase.jl) in Zed — a small,
+runnable JuMP model that uses one of each.
+
 ## Rebuild
 
 `uv run build.py` writes `themes/paper-and-ink.json` and fails if a colour drops
