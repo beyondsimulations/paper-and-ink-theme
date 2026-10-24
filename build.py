@@ -103,7 +103,7 @@ def blend(fg, bg):
 
 DARK = {
     "name": "Paper & Ink Dark", "appearance": "dark",
-    "ground": (0.19, 0.006, 65),  # "Deep ink"
+    "ground": (0.19, 0.003, 250),  # "Deep ink", neutral with a hint of cool
     "palette": {
         # text, brightest first
         "prose": (0.94, 0.018, 75),  # all comments and markdown: the page text, in italic

@@ -48,7 +48,7 @@ def test_mapping():
         assert syn["function.macro"]["color"] == P["macro"]
         assert style["warning"] == P["constant"] != syn["function"]["color"]
     dark, light = (t["style"] for t in family["themes"])
-    assert dark["editor.background"] == "#161311"
+    assert dark["editor.background"] == "#131415"
     assert light["editor.background"] == "#FFFDFC"  # the website's page colour
     # panels sit below the editor in both: deeper than the ink, greyer than the paper
     for style in (dark, light):

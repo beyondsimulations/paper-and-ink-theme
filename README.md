@@ -54,7 +54,7 @@ the base hues, not lighter ones.
 | Numbers, constants | `#F5A75E` | `#A94E03` |
 | Keywords, types | `#7ABAE0` | `#2E6896` |
 | Macros, decorators | `#F3928F` | `#A83F59` |
-| Background | `#161311` | `#FFFDFC` |
+| Background | `#131415` | `#FFFDFC` |
 
 ## Rebuild
 
