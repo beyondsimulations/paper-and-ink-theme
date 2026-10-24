@@ -91,6 +91,14 @@ def wcag(a, b):
     return (hi + 0.05) / (lo + 0.05)
 
 
+def blend(fg, bg):
+    """An #RRGGBBAA colour composited over an opaque background, as the GPU does it."""
+    f, b = fg.lstrip("#"), bg.lstrip("#")
+    a = int(f[6:8], 16) / 255 if len(f) == 8 else 1.0
+    return "#" + "".join(
+        f"{round(int(f[i:i + 2], 16) * a + int(b[i:i + 2], 16) * (1 - a)):02X}" for i in (0, 2, 4))
+
+
 # ---- the two themes: every colour as OKLCH (L, C, h) ----
 
 DARK = {
@@ -99,10 +107,10 @@ DARK = {
     "palette": {
         # text, brightest first
         "prose": (0.94, 0.018, 75),  # all comments and markdown: the page text, in italic
-        "code": (0.85, 0.008, 75),  # plain code, a clear step below the prose
+        "code": (0.855, 0.008, 75),  # plain code, a clear step below the prose
         "muted": (0.72, 0.010, 70),
-        "punct": (0.64, 0.010, 70),
-        "line_number": (0.62, 0.010, 65),  # WCAG AA 4.5:1 on the active line
+        "punct": (0.66, 0.010, 70),  # AA on the lightest surface it sits on: a hovered row
+        "line_number": (0.63, 0.010, 65),  # WCAG AA 4.5:1 on the highlighted line
         "disabled": (0.44, 0.008, 65),
         # syntax hues, lightness stepped by role
         "call": (0.87, 0.102, 90),  # gold
@@ -120,9 +128,11 @@ DARK = {
         "raised": (0.05, 0.002), "hover": (0.085, 0.004), "active_line": (0.03, 0.002),
         "highlighted_line": (0.045, 0.002), "wrap": (0.05, 0), "wrap_active": (0.12, 0), "invisible": (0.15, 0),
         "indent": (0.07, 0), "indent_active": (0.17, 0), "indent_hover": (0.22, 0),
-        "black": (0.05, 0), "bright_black": (0.26, 0), "dim_black": (-0.03, 0),
+        "black": (0.05, 0), "bright_black": (0.32, 0), "dim_black": (-0.03, 0),
     },
     "selected": (0.12, 0.029, 235),  # offset from the ground, with its own hue
+    # alpha suffixes of the tinted washes; reading text keeps AA on the composite
+    "washes": {"match": "40", "active_match": "66", "doc_read": "22", "doc_write": "33"},
     # terminal: (base, bright, dim), each a palette role, a shade or an OKLCH triple
     "ansi": {
         "black": ("black", "bright_black", "dim_black"),
@@ -144,17 +154,17 @@ LIGHT = {
         "prose": (0.27, 0.020, 55),  # the darkest text, in italic
         "code": (0.42, 0.012, 60),
         "muted": (0.50, 0.010, 60),
-        "punct": (0.545, 0.010, 60),
-        "line_number": (0.55, 0.010, 60),  # WCAG AA, like every text colour
+        "punct": (0.515, 0.010, 60),  # AA on the darkest surface it sits on: a hovered row
+        "line_number": (0.53, 0.010, 60),  # WCAG AA on the highlighted line
         "disabled": (0.72, 0.008, 60),
         # the dark theme's hues, darkened for paper
-        "call": (0.50, 0.110, 80),  # ochre, kept 0.09 from the darker orange
+        "call": (0.48, 0.110, 80),  # ochre, kept 0.09 from the darker orange
         "string": (0.51, 0.065, 195),  # teal
-        "constant": (0.555, 0.150, 52),  # orange, dark enough for 4.5:1
+        "constant": (0.53, 0.155, 50),  # orange, AA on panels and hovered rows too
         "keyword": (0.50, 0.095, 245),  # blue
         "macro": (0.52, 0.140, 8),  # rose, apart from the error red
         "violet": (0.50, 0.100, 300),
-        "error": (0.55, 0.200, 32),
+        "error": (0.54, 0.200, 32),  # AA on hovered rows too
         "selection": (0.62, 0.060, 240),
     },
     # on paper every surface steps darker, slightly warm; popovers stay paper-white
@@ -166,14 +176,17 @@ LIGHT = {
         "indent_active": (-0.18, 0.004), "indent_hover": (-0.24, 0.004),
     },
     "selected": (-0.10, 0.03, 240),
+    "washes": {"match": "1F", "active_match": "55", "doc_read": "16", "doc_write": "1F"},
+    # on paper, brightness reads as saturation: the bright variants are the vivid
+    # versions of the base hues, not the lighter ones
     "ansi": {
-        "black": ((0.35, 0.010, 60), (0.55, 0.010, 60), (0.45, 0.010, 60)),
-        "red": ("error", (0.62, 0.17, 32), (0.45, 0.15, 32)),
-        "green": ("string", (0.60, 0.07, 195), (0.42, 0.05, 195)),
+        "black": ((0.35, 0.010, 60), (0.52, 0.010, 60), (0.45, 0.010, 60)),
+        "red": ("error", (0.55, 0.24, 18), (0.45, 0.15, 32)),
+        "green": ("string", (0.52, 0.13, 165), (0.42, 0.05, 195)),
         "yellow": ("constant", "call", (0.48, 0.12, 55)),
-        "blue": ("keyword", (0.60, 0.09, 245), (0.42, 0.08, 245)),
-        "magenta": ("violet", (0.60, 0.09, 300), (0.42, 0.08, 300)),
-        "cyan": ((0.55, 0.07, 215), (0.63, 0.06, 215), (0.45, 0.05, 215)),
+        "blue": ("keyword", (0.52, 0.14, 255), (0.42, 0.08, 245)),
+        "magenta": ("violet", (0.52, 0.16, 315), (0.42, 0.08, 300)),
+        "cyan": ((0.52, 0.07, 215), (0.52, 0.125, 195), (0.45, 0.05, 215)),
         "white": ((0.85, 0.008, 60), (0.95, 0.005, 60), (0.75, 0.008, 60)),
     },
 }
@@ -199,6 +212,7 @@ def ui(theme):
     p = hexes(theme)
     sh = lambda name: shade(theme, name)
     L, C, _ = theme["ground"]
+    w = theme["washes"]
     dl, dc, hue = theme["selected"]
     editor, panel, raised, hover = oklch_to_hex(*theme["ground"]), sh("panel"), sh("raised"), sh("hover")
     selected = oklch_to_hex(L + dl, C + dc, hue)
@@ -220,7 +234,8 @@ def ui(theme):
         "title_bar.inactive_background": sh("title_inactive"),
         "toolbar.background": editor, "tab_bar.background": panel, "tab.inactive_background": panel,
         "tab.active_background": editor,
-        "search.match_background": p["constant"] + "40", "search.active_match_background": p["constant"] + "73",
+        "search.match_background": p["constant"] + w["match"],
+        "search.active_match_background": p["constant"] + w["active_match"],
         "panel.background": panel, "panel.focused_border": p["keyword"] + "99",
         "panel.indent_guide": sh("indent"), "panel.indent_guide_active": sh("indent_active"),
         "panel.indent_guide_hover": sh("indent_hover"), "pane.focused_border": p["keyword"] + "99",
@@ -234,9 +249,9 @@ def ui(theme):
         "editor.invisible": sh("invisible"), "editor.wrap_guide": sh("wrap"),
         "editor.active_wrap_guide": sh("wrap_active"),
         "editor.indent_guide": sh("indent"), "editor.indent_guide_active": sh("indent_active"),
-        "editor.document_highlight.read_background": p["keyword"] + "22",
-        "editor.document_highlight.write_background": p["keyword"] + "33",
-        "editor.document_highlight.bracket_background": p["keyword"] + "33",
+        "editor.document_highlight.read_background": p["keyword"] + w["doc_read"],
+        "editor.document_highlight.write_background": p["keyword"] + w["doc_write"],
+        "editor.document_highlight.bracket_background": p["keyword"] + w["doc_write"],
         "terminal.background": panel, "terminal.ansi.background": panel, "terminal.foreground": p["code"],
         "terminal.bright_foreground": p["prose"], "terminal.dim_foreground": p["punct"],
         "link_text.hover": p["constant"],
@@ -319,15 +334,50 @@ def build_family():
 
 # ---- checks ----
 
-# Contrast floors (APCA Lc), checked on the ground and on the active line of each theme.
-# Every checked role must also reach WCAG 2 AA, 4.5:1, on both.
+# Contrast floors (APCA Lc), checked on the editor's line surfaces. Every
+# checked role must also reach WCAG 2 AA, 4.5:1, on all of them.
 FLOORS = {"prose": 75, "code": 75, "call": 55, "string": 55, "constant": 55, "keyword": 55, "macro": 55,
           "error": 45, "punct": 35, "line_number": 30}
+LINE_SURFACES = ("editor.background", "editor.active_line.background", "editor.highlighted_line.background")
+# Text and status markers that sit on panels, popovers and hovered rows
+PANEL_TEXT = ("text", "text.muted", "text.placeholder", "text.accent", "icon", "icon.muted",
+              "icon.placeholder", "icon.accent", "link_text.hover", "conflict", "created", "deleted",
+              "error", "hidden", "hint", "ignored", "info", "modified", "predictive", "renamed",
+              "success", "unreachable", "warning")
+PANEL_SURFACES = ("panel.background", "elevated_surface.background", "element.hover")
+# Reading roles under the tinted washes. Error and punctuation, the de-emphasis
+# pair, are allowed to fade under a wash: they are not reading text.
+READING = ("prose", "code", "call", "string", "constant", "keyword", "macro")
+# Persistent washes hold AA for reading text; the active search match is a
+# transient highlight, like selection, and only needs to stay findable.
+WASHES = (("search.match_background", 4.5), ("editor.document_highlight.read_background", 4.5),
+          ("editor.document_highlight.write_background", 4.5),
+          ("editor.document_highlight.bracket_background", 4.5), ("search.active_match_background", 3.0))
+# The de-emphasis floor, for what is meant to sit visibly below the text
+DE_EMPHASIS = 3.0
 # Keys Zed's own One Dark sets that schema v0.2.0 does not list yet
 NEWER_KEYS = ["search.active_match_background", "editor.hover_line_number", "version_control.added",
               "version_control.modified", "version_control.deleted", "version_control.word_added",
               "version_control.word_deleted", "version_control.conflict_marker.ours",
               "version_control.conflict_marker.theirs"]
+
+
+def ansi_checks(theme):
+    """(key, WCAG floor) for every ANSI colour a program can print as text.
+
+    The family that mirrors the background (black in the dark theme, white in
+    the light one) is a fill colour, except dark bright black: the conventional
+    de-emphasized grey. Dim variants de-emphasize on purpose, so they only need
+    the de-emphasis floor.
+    """
+    dark = theme["appearance"] == "dark"
+    bg_family = "black" if dark else "white"
+    checks = [("terminal.ansi.bright_black", DE_EMPHASIS)] if dark else []
+    for name in ("black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"):
+        if name != bg_family:
+            checks += [(f"terminal.ansi.{name}", 4.5), (f"terminal.ansi.bright_{name}", 4.5),
+                       (f"terminal.ansi.dim_{name}", DE_EMPHASIS)]
+    return checks
 
 
 def shipped_colours(style):
@@ -354,7 +404,7 @@ def check(family, schema):
         style, name = theme["style"], theme["name"]
         failures += [f"{name}: missing key: {k}" for k in wanted if k not in style]
         c = shipped_colours(style)
-        for bg_key in ("editor.background", "editor.active_line.background"):
+        for bg_key in LINE_SURFACES:
             for role, floor in FLOORS.items():
                 lc = apca(c[role], style[bg_key])
                 if lc < floor:
@@ -362,6 +412,28 @@ def check(family, schema):
                 ratio = wcag(c[role], style[bg_key])
                 if ratio < 4.5:
                     failures.append(f"{name}: wcag: {role} {c[role]} on {bg_key} is {ratio:.2f}:1, needs 4.5:1")
+            ratio = wcag(style["editor.hover_line_number"], style[bg_key])
+            if ratio < 4.5:
+                failures.append(f"{name}: wcag: hover_line_number on {bg_key} is {ratio:.2f}:1, needs 4.5:1")
+        for key in PANEL_TEXT:
+            for bg_key in PANEL_SURFACES:
+                ratio = wcag(style[key], style[bg_key])
+                if ratio < 4.5:
+                    failures.append(f"{name}: wcag: {key} {style[key]} on {bg_key} is {ratio:.2f}:1, needs 4.5:1")
+        for key in ("terminal.foreground", "terminal.bright_foreground", "terminal.dim_foreground"):
+            ratio = wcag(style[key], style["terminal.background"])
+            if ratio < 4.5:
+                failures.append(f"{name}: wcag: {key} on terminal.background is {ratio:.2f}:1, needs 4.5:1")
+        for key, floor in ansi_checks(theme):
+            ratio = wcag(style[key], style["terminal.background"])
+            if ratio < floor:
+                failures.append(f"{name}: wcag: {key} {style[key]} on terminal.background is {ratio:.2f}:1, needs {floor}:1")
+        for key, floor in WASHES:
+            composite = blend(style[key], style["editor.background"])
+            for role in READING:
+                ratio = wcag(c[role], composite)
+                if ratio < floor:
+                    failures.append(f"{name}: wash: {role} on {key} {style[key]} ({composite}) is {ratio:.2f}:1, needs {floor}:1")
         for a, b, need in (("prose", "code", 0.05), ("call", "constant", 0.08), ("error", "macro", 0.08)):
             d = oklab_distance(c[a], c[b])
             if d < need:

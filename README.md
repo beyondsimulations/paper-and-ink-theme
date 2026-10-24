@@ -12,6 +12,12 @@ Most themes grey out comments. In tutorials and notebooks in percent format
 strongest contrast on screen, sets them in italic and gives the code fewer,
 calmer colours.
 
+I built it primarily with the students in my courses in mind, especially those
+learning Julia and JuMP: lecture notes, exercise sheets and tutorial cells are
+mostly prose with short bursts of code in between, and that is what it is
+tuned for. The terminal's ANSI colours match the editor, so the Julia REPL
+reads like the notebook around it.
+
 ## Install
 
 Open the command palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` elsewhere),
@@ -26,18 +32,26 @@ To follow your system's light and dark mode, put this in your settings
 
 ## Colours
 
-Every colour is defined once in `build.py` as OKLCH. Contrast follows APCA:
-comments Lc 94 (dark) and 97 (light), plain code Lc 76 and 84, every syntax
-colour at least Lc 55. Every text colour, line numbers included, also meets
-WCAG 2 AA (4.5:1) in both themes.
+Every colour is defined once in `build.py` as OKLCH. On the editor background,
+contrast follows APCA: comments Lc 94 (dark) and 101 (light), plain code Lc 77
+and 88, and every syntax hue at least Lc 55. Every text colour — line numbers,
+panel and status text, the terminal foregrounds and the ANSI colours in their
+text roles included — meets WCAG 2 AA (4.5:1) on every surface it appears on,
+and reading text keeps AA under the editor's tinted washes. What sits below on
+purpose: errors and punctuation (Lc 45 and 35 — underlines and de-emphasized
+marks, not reading text; they fade under washes), the dim ANSI variants, the
+dark terminal's grey, and text under the active search match, a transient
+highlight like selection — all at 3:1. On paper, brightness reads as
+saturation: the light theme's bright ANSI colours are the vivid versions of
+the base hues, not lighter ones.
 
 | Role | Dark | Light |
 |---|---|---|
 | Comments (italic), markdown text | `#F2EADE` | `#2E241D` |
-| Plain code | `#D1CDC8` | `#524C47` |
-| Function calls (bold where defined) | `#EED284` | `#815B04` |
+| Plain code | `#D2CFCA` | `#524C47` |
+| Function calls (bold where defined) | `#EED284` | `#7A5604` |
 | Strings | `#97CDCC` | `#327272` |
-| Numbers, constants | `#F5A75E` | `#B15602` |
+| Numbers, constants | `#F5A75E` | `#A94E03` |
 | Keywords, types | `#7ABAE0` | `#2E6896` |
 | Macros, decorators | `#F3928F` | `#A83F59` |
 | Background | `#161311` | `#FFFDFC` |
