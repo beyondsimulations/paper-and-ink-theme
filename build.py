@@ -150,28 +150,30 @@ LIGHT = {
     "name": "Paper & Ink Light", "appearance": "light",
     "ground": hex_to_oklch("#FFFDFC"),  # the website's page colour
     "palette": {
-        # text, darkest first: ink on paper
-        "prose": (0.27, 0.020, 55),  # the darkest text, in italic
-        "code": (0.42, 0.012, 60),
-        "muted": (0.50, 0.010, 60),
-        "punct": (0.515, 0.010, 60),  # AA on the darkest surface it sits on: a hovered row
-        "line_number": (0.53, 0.010, 60),  # WCAG AA on the highlighted line
-        "disabled": (0.72, 0.008, 60),
-        # the dark theme's hues, darkened for paper
-        "call": (0.48, 0.110, 80),  # ochre, kept 0.09 from the darker orange
-        "string": (0.51, 0.065, 195),  # teal
+        # text, darkest first: slate ink, the websites' #363D45 family
+        "prose": (0.27, 0.015, 252),  # the darkest text, in italic
+        "code": (0.42, 0.012, 252),
+        "muted": (0.50, 0.010, 252),
+        "punct": (0.515, 0.009, 252),  # AA on the darkest surface it sits on: a hovered row
+        "line_number": (0.52, 0.009, 252),  # WCAG AA on the highlighted line
+        "disabled": (0.72, 0.008, 252),
+        # the dark theme's hues, darkened for paper, a touch crisper for clarity
+        "call": (0.48, 0.125, 80),  # ochre, kept 0.09 from the darker orange
+        "string": (0.51, 0.080, 195),  # teal, the websites' accent family
         "constant": (0.53, 0.155, 50),  # orange, AA on panels and hovered rows too
-        "keyword": (0.50, 0.095, 245),  # blue
-        "macro": (0.52, 0.140, 8),  # rose, apart from the error red
+        "keyword": (0.50, 0.115, 245),  # blue, the websites' accent family
+        "macro": (0.52, 0.160, 8),  # rose, apart from the error red
         "violet": (0.50, 0.100, 300),
-        "error": (0.54, 0.200, 32),  # AA on hovered rows too
+        "error": (0.45, 0.165, 25),  # the websites' brick red #9E2B2B, deepened
         "selection": (0.62, 0.060, 240),
     },
-    # on paper every surface steps darker, slightly warm; popovers stay paper-white
+    # cool slate ink on warm paper: the surfaces step darker in the paper's own
+    # warm hue, and the warmth lives in the washes — the active line is the
+    # tutorials' peach code-line highlight
     "shades": {
         "panel": (-0.035, 0.004), "title_inactive": (-0.05, 0.004), "border": (-0.11, 0.004),
         "border_variant": (-0.07, 0.004), "raised": (0, 0), "hover": (-0.06, 0.004),
-        "active_line": (-0.02, 0.003), "highlighted_line": (-0.03, 0.003), "wrap": (-0.06, 0.003),
+        "active_line": (-0.030, 0.0095), "highlighted_line": (-0.040, 0.0155), "wrap": (-0.06, 0.003),
         "wrap_active": (-0.14, 0.004), "invisible": (-0.22, 0.004), "indent": (-0.08, 0.003),
         "indent_active": (-0.18, 0.004), "indent_hover": (-0.24, 0.004),
     },
@@ -180,11 +182,11 @@ LIGHT = {
     # on paper, brightness reads as saturation: the bright variants are the vivid
     # versions of the base hues, not the lighter ones
     "ansi": {
-        "black": ((0.35, 0.010, 60), (0.52, 0.010, 60), (0.45, 0.010, 60)),
-        "red": ("error", (0.55, 0.24, 18), (0.45, 0.15, 32)),
+        "black": ((0.35, 0.010, 252), (0.52, 0.009, 252), (0.45, 0.010, 252)),
+        "red": ("error", (0.46, 0.21, 12), (0.45, 0.15, 32)),
         "green": ("string", (0.52, 0.13, 165), (0.42, 0.05, 195)),
         "yellow": ("constant", "call", (0.48, 0.12, 55)),
-        "blue": ("keyword", (0.52, 0.14, 255), (0.42, 0.08, 245)),
+        "blue": ("keyword", (0.515, 0.14, 255), (0.42, 0.08, 245)),
         "magenta": ("violet", (0.52, 0.16, 315), (0.42, 0.08, 300)),
         "cyan": ((0.52, 0.07, 215), (0.52, 0.125, 195), (0.45, 0.05, 215)),
         "white": ((0.85, 0.008, 60), (0.95, 0.005, 60), (0.75, 0.008, 60)),

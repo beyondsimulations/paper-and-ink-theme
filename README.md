@@ -32,6 +32,10 @@ To follow your system's light and dark mode, put this in your settings
 
 ## Colours
 
+The light theme follows the course websites: slate ink from their `#363D45`
+text, a peach active line like their code-line highlight, and errors in their
+brick red `#9E2B2B`.
+
 Every colour is defined once in `build.py` as OKLCH. On the editor background,
 contrast follows APCA: comments Lc 94 (dark) and 101 (light), plain code Lc 77
 and 88, and every syntax hue at least Lc 55. Every text colour — line numbers,
@@ -47,13 +51,13 @@ the base hues, not lighter ones.
 
 | Role | Dark | Light |
 |---|---|---|
-| Comments (italic), markdown text | `#F2EADE` | `#2E241D` |
-| Plain code | `#D2CFCA` | `#524C47` |
-| Function calls (bold where defined) | `#EED284` | `#7A5604` |
-| Strings | `#97CDCC` | `#327272` |
+| Comments (italic), markdown text | `#F2EADE` | `#21272E` |
+| Plain code | `#D2CFCA` | `#484E54` |
+| Function calls (bold where defined) | `#EED284` | `#7B5601` |
+| Strings | `#97CDCC` | `#1A7474` |
 | Numbers, constants | `#F5A75E` | `#A94E03` |
-| Keywords, types | `#7ABAE0` | `#2E6896` |
-| Macros, decorators | `#F3928F` | `#A83F59` |
+| Keywords, types | `#7ABAE0` | `#1868A0` |
+| Macros, decorators | `#F3928F` | `#B03557` |
 | Background | `#131415` | `#FFFDFC` |
 
 Every colour at a glance: open [`showcase.jl`](showcase.jl) in Zed — a small,
