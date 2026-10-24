@@ -287,7 +287,7 @@ def syntax(theme):
     p = hexes(theme)
 
     def s(role, **extra):
-        return {"color": p[role], "font_style": None, "font_weight": None, **extra}
+        return {"color": p[role], "font_style": None, "font_weight": 500, **extra}  # 500: the code reads slightly heavier than the default 400
     return {
         # prose: comments are the instructions in the tutorials
         "comment": s("prose", font_style="italic"), "comment.doc": s("prose", font_style="italic"),

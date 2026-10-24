@@ -42,7 +42,7 @@ def test_mapping():
         style, syn, P = t["style"], t["style"]["syntax"], build.hexes(theme)
         # the prose is set in italic: that, not the colour, sets it apart from the code
         for key in ("comment", "comment.doc"):
-            assert syn[key] == {"color": P["prose"], "font_style": "italic", "font_weight": None}
+            assert syn[key] == {"color": P["prose"], "font_style": "italic", "font_weight": 500}
         assert style["text"] == P["prose"]
         assert syn["function.definition"] == {"color": P["call"], "font_style": None, "font_weight": 700}
         assert syn["function.macro"]["color"] == P["macro"]
