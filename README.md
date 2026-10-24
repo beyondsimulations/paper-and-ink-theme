@@ -5,7 +5,7 @@ the comments read like the page, the code sits underneath in soft colours.
 **Paper & Ink Dark** puts paper-white comments on deep ink; **Paper & Ink Light**
 puts ink comments on paper.
 
-![Paper & Ink with a Julia tutorial](screenshot.png)
+![Paper & Ink Dark with the showcase JuMP model](screenshot.png)
 
 Most themes grey out comments. In tutorials and notebooks in percent format
 (`# %%` cells), the comments are the instructions, so Paper & Ink gives them the
