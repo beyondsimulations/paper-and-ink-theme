@@ -29,6 +29,9 @@ def test_colour_math():
     # out-of-gamut chroma is reduced, not wrapped
     assert build.oklch_to_hex(0.9, 0.4, 150).startswith("#")
     assert build.oklab_distance("#000000", "#FFFFFF") > 0.99
+    # alpha compositing over an opaque background
+    assert build.blend("#FF000080", "#000000") == "#800000"
+    assert build.blend("#FF0000", "#00FF00") == "#FF0000"
 
 
 def test_mapping():
@@ -50,6 +53,13 @@ def test_mapping():
     # panels sit below the editor in both: deeper than the ink, greyer than the paper
     for style in (dark, light):
         assert build.hex_to_oklch(style["panel.background"])[0] < build.hex_to_oklch(style["editor.background"])[0]
+    # on paper the bright ANSI variants are the vivid versions of the base hues,
+    # not lighter ones: AA caps their lightness, so the punch comes from chroma
+    for name in ("red", "green", "blue", "magenta", "cyan"):
+        base = build.hex_to_oklch(light[f"terminal.ansi.{name}"])
+        bright = build.hex_to_oklch(light[f"terminal.ansi.bright_{name}"])
+        assert abs(bright[0] - base[0]) <= 0.02
+        assert build.oklab_distance(light[f"terminal.ansi.{name}"], light[f"terminal.ansi.bright_{name}"]) >= 0.03
 
 
 def test_real_theme_passes():
@@ -78,6 +88,34 @@ def test_checks_catch_failures():
     assert any(f.startswith("Paper & Ink Light: contrast: prose") for f in broken(["syntax", "comment", "color"], pale, theme=1))
     # WCAG AA too: the first light orange passed APCA but not 4.5:1
     assert any(f.startswith("Paper & Ink Light: wcag: constant") for f in broken(["syntax", "number", "color"], "#BC5B03", theme=1))
+    # text on panels and in the terminal is checked against the surface it sits on,
+    # not just the editor background: the old light punct passed the editor but not the panel
+    assert any(f.startswith("Paper & Ink Light: wcag: text.placeholder")
+               for f in broken(["text.placeholder"], "#756F6A", theme=1))
+    assert any(f.startswith("Paper & Ink Dark: wcag: terminal.dim_foreground")
+               for f in broken(["terminal.dim_foreground"], build.oklch_to_hex(0.40, 0.008, 65)))
+    # ANSI colours in their text roles are held to AA on the terminal background,
+    # and the dim variants and the dark grey to the de-emphasis floor
+    assert any(f.startswith("Paper & Ink Light: wcag: terminal.ansi.bright_red")
+               for f in broken(["terminal.ansi.bright_red"], "#D9553F", theme=1))
+    assert any(f.startswith("Paper & Ink Dark: wcag: terminal.ansi.bright_black")
+               for f in broken(["terminal.ansi.bright_black"], "#585552"))
+    assert any(f.startswith("Paper & Ink Light: wcag: terminal.ansi.dim_green")
+               for f in broken(["terminal.ansi.dim_green"], build.oklch_to_hex(0.75, 0.01, 60), theme=1))
+    # statuses and placeholder text must clear hovered rows, not just the panel
+    assert any(f.startswith("Paper & Ink Dark: wcag: text.placeholder")
+               for f in broken(["text.placeholder"], "#908B86"))
+    assert any(f.startswith("Paper & Ink Light: wcag: warning")
+               for f in broken(["warning"], "#B15602", theme=1))
+    # line numbers sit on the highlighted line too
+    assert any("line_number" in f and "highlighted" in f
+               for f in broken(["editor.line_number"], "#87827D", theme=1))
+    # reading text keeps AA under the persistent washes and stays findable under
+    # the active match: a full-opacity wash drowns it
+    assert any(f.startswith("Paper & Ink Dark: wash: ")
+               for f in broken(["search.active_match_background"], "#F5A75E"))
+    assert any(f.startswith("Paper & Ink Light: wash: ")
+               for f in broken(["search.match_background"], "#A94E03", theme=1))
     family = build.build_family()
     del family["themes"][1]["style"]["editor.indent_guide"]
     assert "Paper & Ink Light: missing key: editor.indent_guide" in build.check(family, SCHEMA)
