@@ -122,13 +122,19 @@ DARK = {
         "error": (0.70, 0.18, 30),  # vermilion, apart from the macro coral
         "selection": (0.55, 0.06, 235),
     },
-    # UI surfaces as (lightness, chroma) offsets from the ground: panels sit deeper, the rest lifts
+    # UI surfaces as (lightness, chroma) offsets from the ground: panels sit deep,
+    # the rest lifts. Chrome sinks well below the page so the editor, active tab and
+    # toolbar read as lit paper over the receding docks. The agent panel cannot be
+    # separated further: Zed has no agent-specific theme tokens (zed#59171), its
+    # backdrop shares panel.background with the docks, and its message cards are
+    # editor.background at ~20% opacity, which flattens into the chrome at this
+    # depth. title_inactive, border and dim_black keep their old panel distances.
     "shades": {
-        "panel": (-0.03, 0), "title_inactive": (-0.045, 0), "border": (-0.06, 0), "border_variant": (0.06, 0),
+        "panel": (-0.055, 0), "title_inactive": (-0.07, 0), "border": (-0.085, 0), "border_variant": (0.06, 0),
         "raised": (0.05, 0.002), "hover": (0.085, 0.004), "active_line": (0.03, 0.002),
         "highlighted_line": (0.045, 0.002), "wrap": (0.05, 0), "wrap_active": (0.12, 0), "invisible": (0.15, 0),
         "indent": (0.07, 0), "indent_active": (0.17, 0), "indent_hover": (0.22, 0),
-        "black": (0.05, 0), "bright_black": (0.32, 0), "dim_black": (-0.03, 0),
+        "black": (0.05, 0), "bright_black": (0.32, 0), "dim_black": (-0.055, 0),
     },
     "selected": (0.12, 0.029, 235),  # offset from the ground, with its own hue
     # alpha suffixes of the tinted washes; reading text keeps AA on the composite
@@ -154,13 +160,13 @@ LIGHT = {
         "prose": (0.27, 0.015, 252),  # the darkest text, in italic
         "code": (0.42, 0.012, 252),
         "muted": (0.50, 0.010, 252),
-        "punct": (0.515, 0.009, 252),  # AA on the darkest surface it sits on: a hovered row
+        "punct": (0.509, 0.009, 252),  # AA on the darkest surface it sits on: a hovered row
         "line_number": (0.52, 0.009, 252),  # WCAG AA on the highlighted line
         "disabled": (0.72, 0.008, 252),
         # the dark theme's hues, darkened for paper, a touch crisper for clarity
-        "call": (0.48, 0.125, 80),  # ochre, kept 0.09 from the darker orange
-        "string": (0.51, 0.080, 195),  # teal, the websites' accent family
-        "constant": (0.53, 0.155, 50),  # orange, AA on panels and hovered rows too
+        "call": (0.474, 0.125, 80),  # ochre, kept clear of the darker orange
+        "string": (0.500, 0.080, 195),  # teal, the websites' accent family
+        "constant": (0.522, 0.155, 50),  # orange, AA on panels and hovered rows too
         "keyword": (0.50, 0.115, 245),  # blue, the websites' accent family
         "macro": (0.52, 0.160, 8),  # rose, apart from the error red
         "violet": (0.50, 0.100, 300),
@@ -171,8 +177,8 @@ LIGHT = {
     # warm hue, and the warmth lives in the washes — the active line is the
     # tutorials' peach code-line highlight
     "shades": {
-        "panel": (-0.035, 0.004), "title_inactive": (-0.05, 0.004), "border": (-0.11, 0.004),
-        "border_variant": (-0.07, 0.004), "raised": (0, 0), "hover": (-0.06, 0.004),
+        "panel": (-0.05, 0.004), "title_inactive": (-0.065, 0.004), "border": (-0.125, 0.004),
+        "border_variant": (-0.07, 0.004), "raised": (0, 0), "hover": (-0.075, 0.004),
         "active_line": (-0.030, 0.0095), "highlighted_line": (-0.040, 0.0155), "wrap": (-0.06, 0.003),
         "wrap_active": (-0.14, 0.004), "invisible": (-0.22, 0.004), "indent": (-0.08, 0.003),
         "indent_active": (-0.18, 0.004), "indent_hover": (-0.24, 0.004),
@@ -184,7 +190,7 @@ LIGHT = {
     "ansi": {
         "black": ((0.35, 0.010, 252), (0.52, 0.009, 252), (0.45, 0.010, 252)),
         "red": ("error", (0.46, 0.21, 12), (0.45, 0.15, 32)),
-        "green": ("string", (0.52, 0.13, 165), (0.42, 0.05, 195)),
+        "green": ("string", (0.514, 0.13, 165), (0.42, 0.05, 195)),
         "yellow": ("constant", "call", (0.48, 0.12, 55)),
         "blue": ("keyword", (0.515, 0.14, 255), (0.42, 0.08, 245)),
         "magenta": ("violet", (0.52, 0.16, 315), (0.42, 0.08, 300)),

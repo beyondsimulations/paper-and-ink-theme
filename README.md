@@ -53,9 +53,9 @@ the base hues, not lighter ones.
 |---|---|---|
 | Comments (italic), markdown text | `#F2EADE` | `#21272E` |
 | Plain code | `#D2CFCA` | `#484E54` |
-| Function calls (bold where defined) | `#EED284` | `#7B5601` |
-| Strings | `#97CDCC` | `#1A7474` |
-| Numbers, constants | `#F5A75E` | `#A94E03` |
+| Function calls (bold where defined) | `#EED284` | `#785503` |
+| Strings | `#97CDCC` | `#157171` |
+| Numbers, constants | `#F5A75E` | `#A54C02` |
 | Keywords, types | `#7ABAE0` | `#1868A0` |
 | Macros, decorators | `#F3928F` | `#B03557` |
 | Background | `#131415` | `#FFFDFC` |
