@@ -127,6 +127,43 @@ def test_checks_catch_failures():
     assert family == snapshot
 
 
+def test_quarto_outputs():
+    PL, PD = build.hexes(build.LIGHT), build.hexes(build.DARK)
+    light = build.quarto_theme(build.LIGHT, "#FFEEE2")
+    dark = build.quarto_theme(build.DARK, "#191B1D")
+    # every class Quarto's highlighter puts on a span gets a colour
+    assert len(build.KDE_ROLES) == 31 and set(light["text-styles"]) == set(build.KDE_ROLES)
+    # comments and docstrings are the prose, in italic, as in Zed
+    assert light["text-styles"]["Comment"] == {"text-color": PL["prose"], "selected-text-color": PL["prose"], "italic": True}
+    assert dark["text-styles"]["Documentation"]["text-color"] == PD["prose"]
+    assert "italic" not in light["text-styles"]["Keyword"]
+    # built-ins are the only calls Quarto marks; True/None/self arrive as Variable
+    assert light["text-styles"]["BuiltIn"]["text-color"] == PL["call"]
+    assert light["text-styles"]["Variable"]["text-color"] == PL["constant"]
+    assert dark["editor-colors"]["BackgroundColor"] == "#191B1D"
+    site = build.site_colours()
+    assert site["light"]["code_surface"] == "#FFEEE2"
+    assert site["dark"]["code_surface"] == build.shade(build.DARK, "active_line") == "#191B1D"
+    assert site["dark"]["ground"] == "#131415"
+    assert site["dark"]["text"] == "#E0DAD2"
+    assert site["dark"]["border"] == "#212223"
+    scss = build.site_scss()
+    assert "$pi-dark-code-surface: #191B1D !default;" in scss
+    assert "$pi-light-string: #157171 !default;" in scss
+
+
+def test_site_checks():
+    assert build.site_check(build.site_colours()) == []
+    # a grey wash under light code: the syntax colours drop below AA
+    site = build.site_colours()
+    site["light"]["code_surface"] = "#C9C1BB"
+    assert any(f.startswith("site light: ") for f in build.site_check(site))
+    # dark muted text too close to the ground
+    site = build.site_colours()
+    site["dark"]["muted"] = "#5A5550"
+    assert any(f.startswith("site dark: muted") for f in build.site_check(site))
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

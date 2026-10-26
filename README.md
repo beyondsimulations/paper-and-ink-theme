@@ -66,7 +66,9 @@ runnable JuMP model that uses one of each.
 ## Rebuild
 
 `uv run build.py` writes `themes/paper-and-ink.json` and fails if a colour drops
-below its contrast floor. `uv run test_build.py` checks the colour maths.
+below its contrast floor. It also writes `quarto/`: the highlight themes and colour variables the course
+websites use, synced to them by Lecture-Foundations.
+`uv run test_build.py` checks the colour maths.
 
 ## License
 
