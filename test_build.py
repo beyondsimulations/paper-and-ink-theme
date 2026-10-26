@@ -180,6 +180,15 @@ def test_site_ansi():
     assert any(f.startswith("site light: ansi_yellow") for f in build.site_check(broken))
 
 
+def test_site_code_bar():
+    # the dark code bar is the light bar's rose (#EBADAD, hue 18.8) at L 0.66: visible, 5.7:1
+    assert build.site_colours()["dark"]["code_bar"] == "#C17D7E"
+    # a bar is a visible boundary, held to WCAG's 3:1 for graphics; the first one was 2.5:1
+    broken = build.site_colours()
+    broken["dark"]["code_bar"] = "#6E4F4F"
+    assert any(f.startswith("site dark: code_bar") for f in build.site_check(broken))
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -379,7 +379,7 @@ def site_colours():
             "text": oklch_to_hex(0.89, 0.013, 75),  # between the code and the prose
             "heading": d["prose"], "muted": d["muted"], "border": shade(DARK, "border_variant"),
             "code_surface": shade(DARK, "active_line"),  # code blocks look like the editor
-            "string": d["string"], "code_bar": "#6E4F4F",
+            "string": d["string"], "code_bar": oklch_to_hex(0.66, 0.085, 18),  # the light bar's rose, lifted for the dark ground,
         },
     }
     for theme, mode in ((LIGHT, "light"), (DARK, "dark")):
@@ -430,6 +430,9 @@ def site_check(site):
                 ratio = wcag(value, surface)
                 if ratio < 4.5:
                     failures.append(f"site {mode}: {name} {value} on {surface_name} {surface} is {ratio:.2f}:1, needs 4.5:1")
+    bar = wcag(site["dark"]["code_bar"], site["dark"]["ground"])
+    if bar < 3.0:
+        failures.append(f"site dark: code_bar {site['dark']['code_bar']} on {site['dark']['ground']} is {bar:.2f}:1, needs 3:1")
     dark = site["dark"]
     for name in ("text", "heading", "muted"):
         ratio = wcag(dark[name], dark["ground"])
