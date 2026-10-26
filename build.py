@@ -365,12 +365,15 @@ KDE_ROLES = {
 }
 
 
+ANSI_HUES = ("red", "green", "yellow", "blue", "magenta", "cyan")
+
+
 def site_colours():
     """Every colour the sites take from Paper & Ink besides the syntax, per mode."""
     d, l = hexes(DARK), hexes(LIGHT)
-    return {
+    site = {
         # the sites' peach codeline, kept (2026-10-26); see the active_line note in LIGHT
-        "light": {"code_surface": "#FFEEE2", "string": l["string"]},
+        "light": {"ground": oklch_to_hex(*LIGHT["ground"]), "code_surface": "#FFEEE2", "string": l["string"]},
         "dark": {
             "ground": oklch_to_hex(*DARK["ground"]),
             "text": oklch_to_hex(0.89, 0.013, 75),  # between the code and the prose
@@ -379,6 +382,14 @@ def site_colours():
             "string": d["string"], "code_bar": "#6E4F4F",
         },
     }
+    for theme, mode in ((LIGHT, "light"), (DARK, "dark")):
+        style = ui(theme)
+        for hue in ANSI_HUES:
+            site[mode][f"ansi_{hue}"] = style[f"terminal.ansi.{hue}"]
+            site[mode][f"ansi_bright_{hue}"] = style[f"terminal.ansi.bright_{hue}"]
+        # the grey Julia prints for de-emphasis; the terminal's own bright black is only held to 3:1
+        site[mode]["ansi_bright_black"] = hexes(theme)["muted"]
+    return site
 
 
 def quarto_theme(theme, surface):
@@ -410,6 +421,15 @@ def site_check(site):
             ratio = wcag(p[role], surface)
             if ratio < 4.5:
                 failures.append(f"site {mode}: {role} {p[role]} on code surface {surface} is {ratio:.2f}:1, needs 4.5:1")
+    for mode in ("light", "dark"):
+        for name, value in site[mode].items():
+            if not name.startswith("ansi_"):
+                continue
+            for surface_name in ("ground", "code_surface"):
+                surface = site[mode][surface_name]
+                ratio = wcag(value, surface)
+                if ratio < 4.5:
+                    failures.append(f"site {mode}: {name} {value} on {surface_name} {surface} is {ratio:.2f}:1, needs 4.5:1")
     dark = site["dark"]
     for name in ("text", "heading", "muted"):
         ratio = wcag(dark[name], dark["ground"])

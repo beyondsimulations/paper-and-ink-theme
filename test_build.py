@@ -164,6 +164,22 @@ def test_site_checks():
     assert any(f.startswith("site dark: muted") for f in build.site_check(site))
 
 
+def test_site_ansi():
+    site = build.site_colours()
+    for mode, theme in (("light", build.LIGHT), ("dark", build.DARK)):
+        style = build.ui(theme)
+        for hue in build.ANSI_HUES:
+            assert site[mode][f"ansi_{hue}"] == style[f"terminal.ansi.{hue}"]
+            assert site[mode][f"ansi_bright_{hue}"] == style[f"terminal.ansi.bright_{hue}"]
+        assert site[mode]["ansi_bright_black"] == build.hexes(theme)["muted"]
+    assert site["light"]["ground"] == "#FFFDFC"
+    assert "$pi-dark-ansi-yellow: #F5A75E !default;" in build.site_scss()
+    # Quarto's notebook yellow on the light page: 1.9:1
+    broken = build.site_colours()
+    broken["light"]["ansi_yellow"] = "#DDB62B"
+    assert any(f.startswith("site light: ansi_yellow") for f in build.site_check(broken))
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
