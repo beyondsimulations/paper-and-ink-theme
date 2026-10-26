@@ -389,6 +389,7 @@ def site_colours():
             site[mode][f"ansi_bright_{hue}"] = style[f"terminal.ansi.bright_{hue}"]
         # the grey Julia prints for de-emphasis; the terminal's own bright black is only held to 3:1
         site[mode]["ansi_bright_black"] = hexes(theme)["muted"]
+        site[mode]["line_number"] = hexes(theme)["line_number"]  # Quarto ignores the theme's LineNumbers; the core styles it
     return site
 
 
@@ -401,7 +402,7 @@ def quarto_theme(theme, surface):
         if role == "prose":
             styles[cls]["italic"] = True
     return {"metadata": {"name": theme["name"], "revision": 1, "license": "MIT"},
-            "text-styles": styles, "editor-colors": {"BackgroundColor": surface}}
+            "text-styles": styles, "editor-colors": {"BackgroundColor": surface, "LineNumbers": p["line_number"]}}
 
 
 def site_scss():
@@ -423,7 +424,7 @@ def site_check(site):
                 failures.append(f"site {mode}: {role} {p[role]} on code surface {surface} is {ratio:.2f}:1, needs 4.5:1")
     for mode in ("light", "dark"):
         for name, value in site[mode].items():
-            if not name.startswith("ansi_"):
+            if name != "line_number" and not name.startswith("ansi_"):
                 continue
             for surface_name in ("ground", "code_surface"):
                 surface = site[mode][surface_name]

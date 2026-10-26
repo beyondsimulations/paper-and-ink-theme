@@ -141,6 +141,9 @@ def test_quarto_outputs():
     assert light["text-styles"]["BuiltIn"]["text-color"] == PL["call"]
     assert light["text-styles"]["Variable"]["text-color"] == PL["constant"]
     assert dark["editor-colors"]["BackgroundColor"] == "#191B1D"
+    # deck line numbers: without this Quarto leaves them in the link colour
+    assert light["editor-colors"]["LineNumbers"] == PL["line_number"]
+    assert dark["editor-colors"]["LineNumbers"] == PD["line_number"]
     site = build.site_colours()
     assert site["light"]["code_surface"] == "#FFEEE2"
     assert site["dark"]["code_surface"] == build.shade(build.DARK, "active_line") == "#191B1D"
@@ -162,6 +165,17 @@ def test_site_checks():
     site = build.site_colours()
     site["dark"]["muted"] = "#5A5550"
     assert any(f.startswith("site dark: muted") for f in build.site_check(site))
+
+
+def test_site_line_numbers():
+    site = build.site_colours()
+    assert site["light"]["line_number"] == "#65696E" and site["dark"]["line_number"] == "#8E8883"
+    assert "$pi-dark-line-number: #8E8883 !default;" in build.site_scss()
+    # the grey of the line numbers is held to AA on each code surface
+    for mode, surface in (("light", "#B9B0A8"), ("dark", "#5A5550")):
+        broken = build.site_colours()
+        broken[mode]["code_surface"] = surface
+        assert any(f.startswith(f"site {mode}: line_number") for f in build.site_check(broken))
 
 
 def test_site_ansi():
